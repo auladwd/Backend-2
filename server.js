@@ -10,10 +10,7 @@ import userRoutes from './routes/users.js';
 import analyticsRoutes from './routes/analytics.js';
 import paymentRoutes from './routes/payment.js';
 import paymentWebhook from './routes/paymentWebhook.js';
-import admin from 'firebase-admin';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import admin from './firebase/firebaseAdmin.js';
 
 dotenv.config();
 
@@ -28,44 +25,6 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-/* ------------------------------------------
-   🟦 Firebase Initialization
-------------------------------------------- */
-if (!admin.apps.length) {
-  try {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const serviceAccountPath = path.resolve(
-      __dirname,
-      'firebase',
-      'firebase-service-account.json'
-    );
-
-    let serviceAccount = {};
-
-    if (fs.existsSync(serviceAccountPath)) {
-      serviceAccount = JSON.parse(
-        fs.readFileSync(serviceAccountPath, { encoding: 'utf8' })
-      );
-    } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    } else {
-      throw new Error(
-        'Firebase service account JSON not found. Provide backend/firebase/firebase-service-account.json or set FIREBASE_SERVICE_ACCOUNT env var.'
-      );
-    }
-
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      projectId: serviceAccount.project_id || 'scholarstream-861d7',
-    });
-
-    console.log('Firebase Admin SDK Initialized');
-  } catch (error) {
-    console.log('Firebase Admin initialization error:', error.message);
-  }
-}
 
 /* ------------------------------------------
    🟦 CORS Middleware

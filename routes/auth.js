@@ -2,7 +2,7 @@ import express from 'express';
 import { getUsersCollection } from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import admin from 'firebase-admin';
+import admin from '../firebase/firebaseAdmin.js';
 import { verifyToken } from '../middleware/verifyToken.js';
 import { toObjectId, isValidObjectId } from '../db/connection.js';
 
