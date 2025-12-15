@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+serviceAccountKey.json
+
+.vercel
+.env*.local
+firebase/firebase-service-account.json
+
+
+
