@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
       sortBy,
       sortOrder,
       page = 1,
-      limit = 12
+      limit = 12,
     } = req.query;
 
     const query = {};
@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
       query.$or = [
         { scholarshipName: { $regex: search, $options: 'i' } },
         { universityName: { $regex: search, $options: 'i' } },
-        { degree: { $regex: search, $options: 'i' } }
+        { degree: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -69,10 +69,12 @@ router.get('/', async (req, res) => {
       scholarships,
       totalPages: Math.ceil(total / parseInt(limit)),
       currentPage: parseInt(page),
-      total
+      total,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching scholarships', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error fetching scholarships', error: error.message });
   }
 });
 
@@ -83,12 +85,17 @@ router.get('/top', async (req, res) => {
     const scholarships = await scholarshipsCollection
       .find()
       .sort({ applicationFees: 1, scholarshipPostDate: -1 })
-      .limit(6)
+      .limit(8)
       .toArray();
 
     res.json(scholarships);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching top scholarships', error: error.message });
+    res
+      .status(500)
+      .json({
+        message: 'Error fetching top scholarships',
+        error: error.message,
+      });
   }
 });
 
@@ -100,14 +107,18 @@ router.get('/:id', async (req, res) => {
     }
 
     const scholarshipsCollection = getScholarshipsCollection();
-    const scholarship = await scholarshipsCollection.findOne({ _id: toObjectId(req.params.id) });
-    
+    const scholarship = await scholarshipsCollection.findOne({
+      _id: toObjectId(req.params.id),
+    });
+
     if (!scholarship) {
       return res.status(404).json({ message: 'Scholarship not found' });
     }
     res.json(scholarship);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching scholarship', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error fetching scholarship', error: error.message });
   }
 });
 
@@ -123,11 +134,20 @@ router.post('/', verifyAdmin, async (req, res) => {
 
     const scholarshipsCollection = getScholarshipsCollection();
     const result = await scholarshipsCollection.insertOne(scholarship);
-    const insertedScholarship = await scholarshipsCollection.findOne({ _id: result.insertedId });
+    const insertedScholarship = await scholarshipsCollection.findOne({
+      _id: result.insertedId,
+    });
 
-    res.status(201).json({ message: 'Scholarship created successfully', scholarship: insertedScholarship });
+    res
+      .status(201)
+      .json({
+        message: 'Scholarship created successfully',
+        scholarship: insertedScholarship,
+      });
   } catch (error) {
-    res.status(500).json({ message: 'Error creating scholarship', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error creating scholarship', error: error.message });
   }
 });
 
@@ -153,9 +173,14 @@ router.put('/:id', verifyAdmin, async (req, res) => {
     if (!result.value) {
       return res.status(404).json({ message: 'Scholarship not found' });
     }
-    res.json({ message: 'Scholarship updated successfully', scholarship: result.value });
+    res.json({
+      message: 'Scholarship updated successfully',
+      scholarship: result.value,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error updating scholarship', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error updating scholarship', error: error.message });
   }
 });
 
@@ -167,14 +192,18 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
     }
 
     const scholarshipsCollection = getScholarshipsCollection();
-    const result = await scholarshipsCollection.findOneAndDelete({ _id: toObjectId(req.params.id) });
+    const result = await scholarshipsCollection.findOneAndDelete({
+      _id: toObjectId(req.params.id),
+    });
 
     if (!result.value) {
       return res.status(404).json({ message: 'Scholarship not found' });
     }
     res.json({ message: 'Scholarship deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting scholarship', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error deleting scholarship', error: error.message });
   }
 });
 
